@@ -1,4 +1,8 @@
+const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 let mode = 'development';
 let target = 'web';
 
@@ -11,15 +15,29 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   // mode defaults to 'production' if not set
   mode: mode,
-
   target: target,
+
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    // this places all images processed in an image folder
+    assetModuleFilename: 'images/[hash][ext][query]',
+  },
 
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        //asset/resource | inline
+        type: 'asset',
+      },
+      {
         test: /\.(s[ac]|c)ss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
+          {
+            loader: MiniCssExtractPlugin.loader,
+            // This is required for asset imports in CSS, such as url()
+            options: { publicPath: '' },
+          },
           'css-loader',
           'postcss-loader',
           'sass-loader',
@@ -35,7 +53,13 @@ module.exports = {
     ],
   },
 
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+    }),
+  ],
 
   resolve: {
     extensions: ['.js', '.jsx'],
