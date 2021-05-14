@@ -1,17 +1,23 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 let mode = 'development';
+let target = 'web';
 
-if (process.env.NODE_ENV == 'production') {
+if (process.env.NODE_ENV === 'production') {
   mode = 'production';
+  // Temporary workaround for 'browserslist' bug that is being patched in the near future
+  target = 'browserslist';
 }
 
 module.exports = {
+  // mode defaults to 'production' if not set
   mode: mode,
+
+  target: target,
 
   module: {
     rules: [
       {
-        test: /\.s?css$/i,
+        test: /\.(s[ac]|c)ss$/i,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
